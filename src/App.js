@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom'
+import { BrowserRouter, Route, Link } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import Bookshelf from './Bookshelf'
 import Search from './Search'
@@ -10,6 +10,7 @@ class BooksApp extends Component {
   constructor() {
     super();
     this.moveBook = this.moveBook.bind(this)
+    this.shelfCheck = this.shelfCheck.bind(this)
     this.search = this.search.bind(this)
     this.timeout =  0;
   }
@@ -42,6 +43,18 @@ class BooksApp extends Component {
     ))
   }
 
+  shelfCheck(selectedBook) {
+    // TODO: REFACTOR THIS
+    var matchingBookArray = this.state.books.filter((book) => {
+      return book.id === selectedBook.id
+    })
+    if (matchingBookArray.length === 1 ) {
+      return matchingBookArray[0].shelf
+    } else {
+      return 'none'
+    }
+  }
+
   clearSearch() {
     this.setState({
       searchResults: []
@@ -68,18 +81,14 @@ class BooksApp extends Component {
     }, 500);
   }
 
-  moveBook(shelf, bookId) {
-    const newBooks = this.state.books.map((book) => {
-      if (book.id === bookId) {
-        book.shelf = shelf;
-      }
-      return book;
-    })
-
-    this.setState(function(prevState, props) {
-      return {
-        books: newBooks
-      };
+  moveBook(shelf, selectedBook) {
+    let newBooks = this.state.books.filter( book => {
+      return book.id !== selectedBook.id;
+    });
+    selectedBook.shelf = shelf;
+    newBooks.push(selectedBook)
+    this.setState({
+      books: newBooks
     });
   }
 
@@ -114,7 +123,7 @@ class BooksApp extends Component {
               searchFunction={this.search}
               searchResults={this.state.searchResults}
               moveFunction={this.moveBook}
-              books={this.state.books}
+              shelfCheck={this.shelfCheck}
             />
           )}/>
         </div>

@@ -4,19 +4,28 @@ import * as BooksAPI from './BooksAPI';
 class Book extends Component {
 
   update(shelf,book) {
-    this.props.bookMover(shelf,book.id) // updates on state level
+    this.props.bookMover(shelf,book) // updates on state level
     BooksAPI.update(book, shelf) // updates on the API Level
   }
 
+  checkShelf() {
+    if (this.props.book.shelf) {
+      return this.props.book.shelf
+    } else {
+      return this.props.shelfCheck(this.props.book);
+    }
+  }
+
   render() {
-    const book = this.props.book;
-    const author = book.authors ? book.authors.join(', ') : null;
+    let selectedBook = this.props.book;
+    let author = selectedBook.authors ? selectedBook.authors.join(', ') : null;
+
     return (
-      <div id={book.id} className="book">
+      <div id={selectedBook.id} className="book">
         <div className="book-top">
-          <img className="book-cover" alt={this.props.book.title} src={this.props.book.imageLinks.smallThumbnail}></img>
+          <img className="book-cover" alt={selectedBook.title} src={selectedBook.imageLinks.smallThumbnail}></img>
           <div className="book-shelf-changer">
-            <select value={book.shelf} onChange={(e)=> {this.update(e.target.value, book)}}>
+            <select value={this.checkShelf()} onChange={(e)=> {this.update(e.target.value, selectedBook)}}>
               <option value="none" disabled>Move to...</option>
               <option value="currentlyReading">Currently Reading</option>
               <option value="wantToRead" >Want to Read</option>
@@ -25,7 +34,7 @@ class Book extends Component {
             </select>
           </div>
         </div>
-        <div className="book-title">{this.props.book.title}</div>
+        <div className="book-title">{selectedBook.title}</div>
         <div className="book-authors">{author}</div>
       </div>
     )
