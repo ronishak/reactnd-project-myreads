@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { BrowserRouter, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import Bookshelf from './Bookshelf'
+import Search from './Search'
 import './App.css'
 
 class BooksApp extends Component {
@@ -9,10 +10,13 @@ class BooksApp extends Component {
   constructor() {
     super();
     this.moveBook = this.moveBook.bind(this)
+    this.search = this.search.bind(this)
+    this.timeout =  0;
   }
 
   state = {
     books: [],
+    searchResults: [],
     shelves: [{
         shelfName:"Currently Reading",
         shelfId:"currentlyReading"
@@ -38,6 +42,32 @@ class BooksApp extends Component {
     ))
   }
 
+  clearSearch() {
+    this.setState({
+      searchResults: []
+    })
+  }
+
+  search(query) {
+    if (this.timeout) clearTimeout(this.timeout);
+    this.timeout = setTimeout(() => {
+      if(query){ // catch empty query
+        BooksAPI.search(query,20).then(results => {
+          if (!results.error) {
+            this.setState({
+              searchResults: results
+            })
+          } else {
+            alert(results.error)
+            this.clearSearch()
+          }
+        })
+      } else {
+        this.clearSearch()
+      }
+    }, 500);
+  }
+
   moveBook(shelf, bookId) {
     const newBooks = this.state.books.map((book) => {
       if (book.id === bookId) {
@@ -46,9 +76,11 @@ class BooksApp extends Component {
       return book;
     })
 
-    this.setState({
-      books: newBooks
-    })
+    this.setState(function(prevState, props) {
+      return {
+        books: newBooks
+      };
+    });
   }
 
   render() {
@@ -78,27 +110,12 @@ class BooksApp extends Component {
             </div>
           )}/>
           <Route path='/search' render={() => (
-            <div className="search-books">
-              <div className="search-books-bar">
-                <Link className="close-search" to="/">Close</Link>
-                <div className="search-books-input-wrapper">
-                  {/*
-                    NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                    You can find these search terms here:
-                    https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                    However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                    you don't find a specific author or title. Every search is limited by search terms.
-                    */}
-                  <input type="text" placeholder="Search by title or author"/>
-                </div>
-              </div>
-              <div className="search-books-results">
-                <ol className="books-grid">
-                  
-                </ol>
-              </div>
-            </div>
+            <Search
+              searchFunction={this.search}
+              searchResults={this.state.searchResults}
+              moveFunction={this.moveBook}
+              books={this.state.books}
+            />
           )}/>
         </div>
       </BrowserRouter>
