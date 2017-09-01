@@ -68,13 +68,21 @@ class BooksApp extends Component {
     }, 500);
   }
 
-  moveBook(shelf, bookId) {
-    const newBooks = this.state.books.map((book) => {
+  moveBook(shelf, bookId, bookObj=null) {
+    let newBooks = this.state.books.map((book) => {
       if (book.id === bookId) {
         book.shelf = shelf;
       }
       return book;
     })
+    const existingBook = this.state.books.filter(book => {
+      return book.id === bookId
+    })
+    if (existingBook.length < 1) {
+      // new book
+      bookObj.shelf = shelf
+      newBooks = newBooks.concat(bookObj)
+    }
 
     this.setState(function(prevState, props) {
       return {

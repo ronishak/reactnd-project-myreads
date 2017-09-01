@@ -1,15 +1,15 @@
-import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import Book from './Book';
+import React, { Component } from 'react'
+import { Link } from 'react-router-dom'
+import Book from './Book'
 // import * as BooksAPI from './BooksAPI'
 
 class Search extends Component {
-  render() {
+  render () {
     return (
-      <div className="search-books">
-        <div className="search-books-bar">
-          <Link className="close-search" to="/">Close</Link>
-          <div className="search-books-input-wrapper">
+      <div className='search-books'>
+        <div className='search-books-bar'>
+          <Link className='close-search' to='/'>Close</Link>
+          <div className='search-books-input-wrapper'>
             {/*
               NOTES: The search from BooksAPI is limited to a particular set of search terms.
               You can find these search terms here:
@@ -17,19 +17,21 @@ class Search extends Component {
 
               However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
               you don't find a specific author or title. Every search is limited by search terms.
-              */}
-            <input type="text" onChange={(e) => this.props.searchFunction(e.target.value)} placeholder="Search by title or author"/>
+              */
+            }
+            <input
+              type='text'
+              onChange={e => this.props.searchFunction(e.target.value)}
+              placeholder='Search by title or author'
+            />
           </div>
         </div>
-        <div className="search-books-results">
-          <ol className="books-grid">
+        <div className='search-books-results'>
+          <ol className='books-grid'>
 
-            {this.props.searchResults.map((book) => (
+            {this.props.searchResults.map(book => (
               <li key={book.id}>
-                <Book
-                  book={book}
-                  bookMover={this.props.moveFunction}
-                />
+                <Book book={book} bookMover={this.props.moveFunction} />
               </li>
             ))}
           </ol>
