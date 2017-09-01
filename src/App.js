@@ -80,6 +80,7 @@ class BooksApp extends Component {
     })
     if (existingBook.length < 1) {
       // new book
+      bookObj.shelf = shelf
       newBooks = newBooks.concat(bookObj)
     }
 
